@@ -2,22 +2,29 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+            [ring.middleware.params :as rmp]
             [ring.adapter.jetty :as ring]
             [compojure.handler :as handler]
             [ring.middleware.json :as middleware]
             [mytweeter.migrations.migration :as migration]
-            [mytweeter.controllers.tweet-controller :as tweet-controller]))
+            [mytweeter.controllers.tweet-controller :as tweet-controller]
+            [mytweeter.models.tweet :as tweet])
+  (:use ring.util.response))
+
 
 (defroutes app-routes
   (GET "/tweets" [] (tweet-controller/get-all-tweets))
-  (route/not-found "Not Found"))
+  (POST "/tweets" {tweet :body} 
+        (do
+          (tweet-controller/create-tweet (slurp tweet)))))
 
 (def app
  ;(wrap-defaults app-routes api-defaults)
-   (-> (handler/api app-routes)
+  (-> (handler/api app-routes)
       (middleware/wrap-json-body)
-      (middleware/wrap-json-params)
-      (middleware/wrap-json-response)))
+      (rmp/wrap-params)
+      (middleware/wrap-json-response)
+      ))
 
 (defn start [port]
   (ring/run-jetty app {:port port}))
