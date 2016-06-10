@@ -1,5 +1,6 @@
 (ns mytweeter.controllers.tweet-controller
-  (:require [mytweeter.models.tweet :as tweet]))
+  (:require [mytweeter.models.tweet :as tweet])
+  (:require [ring.middleware.json :as json]))
 
 (defn get-all-tweets []
-  (tweet/all))
+  {:body {:tweets (tweet/all)}})

@@ -3,6 +3,8 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.adapter.jetty :as ring]
+            [compojure.handler :as handler]
+            [ring.middleware.json :as middleware]
             [mytweeter.migrations.migration :as migration]
             [mytweeter.controllers.tweet-controller :as tweet-controller]))
 
@@ -11,7 +13,11 @@
   (route/not-found "Not Found"))
 
 (def app
-  (wrap-defaults app-routes api-defaults))
+ ;(wrap-defaults app-routes api-defaults)
+   (-> (handler/api app-routes)
+      (middleware/wrap-json-body)
+      (middleware/wrap-json-params)
+      (middleware/wrap-json-response)))
 
 (defn start [port]
   (ring/run-jetty app {:port port}))
