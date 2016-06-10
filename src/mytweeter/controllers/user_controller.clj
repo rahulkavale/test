@@ -2,4 +2,4 @@
   (:require [mytweeter.models.user :as user]))
 
 (defn get-all-users []
-  ({:body {:users (user/all)}}))
+  {:body {:users (user/all)}})

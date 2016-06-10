@@ -3,12 +3,11 @@
   (:require [clojure.java.jdbc :as sql]))
 
 (defn table-exists? [tablename]
-  (not
-   (empty?
-    (sql/query db/spec [(str "select * from information_schema.tables where table_name ='" tablename  "'" )]))))
+  (empty?
+   (sql/query db/spec [(str "select * from information_schema.tables where table_name ='" tablename  "'" )])))
 
 (defn migrate []
-  (if (and (map table-exists? '("users" "tweets")))
+  (if (reduce #(and %2 %1) (map table-exists? '("users" "tweets")))
     (do
       (println "Running migrations")
       (sql/db-do-commands db/spec
