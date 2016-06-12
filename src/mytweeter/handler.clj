@@ -9,22 +9,30 @@
             [mytweeter.migrations.migration :as migration]
             [mytweeter.controllers.tweet-controller :as tweet-controller]
             [mytweeter.controllers.user-controller :as user-controller]
-            [mytweeter.models.tweet :as tweet])
+            [mytweeter.models.tweet :as tweet]
+            [cheshire.core :refer :all])
   (:use ring.util.response))
 
 
 (defroutes app-routes
   (GET "/tweets" [] (tweet-controller/get-all-tweets))
   (POST "/tweets" {tweet :body}
-        (do
-          (tweet-controller/create-tweet (slurp tweet))))
-  (GET "/users" [] (user-controller/get-all-users)))
+        (tweet-controller/create-tweet (slurp tweet)))
+  (DELETE "/tweets" []
+          (tweet-controller/delete-all) )
+  (GET "/users" [] (user-controller/get-all-users))
+  (POST "/users" {request :body}
+        (let [user-map (slurp request)]
+          (do
+            (user-controller/create-user (parse-string user-map))))))
+
+(defn wrap-middleware [handler]
+  (-> handler
+      (wrap-defaults api-defaults)
+      (middleware/wrap-json-response)))
 
 (def app
- ;(wrap-defaults app-routes api-defaults)
   (-> (handler/api app-routes)
-      (middleware/wrap-json-body)
-      (rmp/wrap-params)
       (middleware/wrap-json-response)))
 
 (defn start [port]

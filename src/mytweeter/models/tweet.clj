@@ -17,4 +17,4 @@
       false)))
 
 (defn delete-all []
-  (sql/query db/spec "delete from tweets"))
+  (sql/delete! db/spec :tweets ["true = ? " true]))

@@ -11,3 +11,6 @@
       (cond
         (= status true) {:status 200}
         :else {:status 400 :error "could not create tweet"}))))
+
+(defn delete-all []
+  (tweet/delete-all))
