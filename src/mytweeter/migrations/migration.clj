@@ -8,7 +8,7 @@
 
 ;TODO add foreign key constraints
 (defn migrate []
-  (if (reduce #(and %2 %1) (map table-exists? '("users" "tweets" "followers")))
+  (if (reduce #(and %2 %1) (map table-exists? '("users" "followers" "tweets" "retweets")))
     (do
       (println "Running migrations")
       (sql/db-do-commands db/spec
@@ -28,5 +28,12 @@
                            :followers
                            [:id :serial "Primary Key"]
                            [:user_id :int "NOT NUll"]
-                           [:follower_id :int "NOT NULL"])))
+                           [:follower_id :int "NOT NULL"]))
+      (sql/db-do-commands db/spec
+                          (sql/create-table-ddl
+                           :retweets
+                           [:id :serial "Primary Key"]
+                           [:user_id :int "NOT NULL"]
+                           [:tweet_id :int "NOT NULL"]
+                           [:created_at :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"])))
     (println "Already migrated")))
