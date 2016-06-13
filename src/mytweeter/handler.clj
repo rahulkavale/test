@@ -24,6 +24,10 @@
   (GET "/tweets" [] (tweet-controller/get-all-tweets))
   (DELETE "/tweets" []
           (tweet-controller/delete-all))
+  (POST "/tweets/:tweet_id/retweet" {payload :body params :params}
+        (let [user (parse-json payload)
+              tweet-id (:tweet_id params)]
+          (tweet-controller/retweet tweet-id user)))
   (GET "/users" [] (user-controller/get-all-users))
   (GET "/users/:user_id/tweets" [user_id]
        (do

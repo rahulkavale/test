@@ -12,5 +12,11 @@
         (= status true) {:status 200}
         :else {:status 400 :body {:error "Could not create tweet"}}))))
 
+(defn retweet [tweet-id user]
+  (do
+    (println (str "retweeting tweet " tweet-id " by user " user))
+    {:status 200}))
+
 (defn delete-all []
   (tweet/delete-all))
+
