@@ -15,7 +15,10 @@
 (defn retweet [tweet-id user]
   (do
     (println (str "retweeting tweet " tweet-id " by user " user))
-    {:status 200}))
+    (let [status (tweet/retweet tweet-id user)]
+      (if (string? status)
+        {:status 404 :body {:error status}}
+        {:status 200}))))
 
 (defn delete-all []
   (tweet/delete-all))
