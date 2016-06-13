@@ -39,11 +39,14 @@
 (defn get-user [user-id]
   (try
     (let [user (query-user user-id)]
-      (println "user " user)
       (first user))
     (catch Exception e
       (println (str " go exception " e))
       false)))
+(defn follows? [user-id follower-id]
+  (not (empty? (into [] (sql/query db/spec
+                               (str "select * from followers where user_id = " user-id
+                                    " and follower_id = " follower-id))))))
 
 (defn follow [user-id follower-id]
   (let [user (get-user user-id)
@@ -51,4 +54,6 @@
     (cond
       (nil? user) (str "User with id " user-id " does not exist")
       (nil? follower) (str "User with id " follower-id " does not exist")
-      :else (create-follower user-id follower-id))))
+      (follows? (read-string user-id) (read-string follower-id))
+      (str "User " follower-id " already follows user " user-id)
+      :else (create-follower (read-string user-id) (read-string follower-id)))))
