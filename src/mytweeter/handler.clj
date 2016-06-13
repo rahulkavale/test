@@ -13,6 +13,9 @@
             [cheshire.core :refer :all])
   (:use ring.util.response))
 
+(defn parse-json [httpInputStream]
+  (let [body (slurp httpInputStream)]
+    (parse-string body)))
 
 (defroutes app-routes
   (GET "/tweets" [] (tweet-controller/get-all-tweets))
@@ -22,9 +25,9 @@
           (tweet-controller/delete-all) )
   (GET "/users" [] (user-controller/get-all-users))
   (POST "/users" {request :body}
-        (let [user-map (slurp request)]
-          (do
-            (user-controller/create-user (parse-string user-map))))))
+        (user-controller/create-user (parse-json request)))
+  (POST "/follow" {follow-info :body}
+        (user-controller/follow (parse-json follow-info))))
 
 (defn wrap-middleware [handler]
   (-> handler

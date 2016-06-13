@@ -10,3 +10,10 @@
       (cond
         (= status true) {:status 200}
         :else {:status 400 :error "could not create user"}))))
+
+
+(defn follow [follow-details]
+  (let [{user "user" follower "follower"} follow-details]
+    (do
+      (println (str "user " user " follower " follower)
+      true))))
