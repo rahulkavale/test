@@ -25,6 +25,10 @@
   (DELETE "/tweets" []
           (tweet-controller/delete-all))
   (GET "/users" [] (user-controller/get-all-users))
+  (GET "/users/:user_id/tweets" [user_id]
+       (do
+         (println (str "user id " user_id))
+         (user-controller/get-user-tweets user_id)))
   (POST "/users" {request :body}
         (user-controller/create-user (parse-json request)))
   (POST "/follow" {follow-info :body}

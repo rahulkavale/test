@@ -36,6 +36,14 @@
     (println (str "looking for user with user-id " user-id ))
     (into [] (sql/query db/spec (str "select * from users where id = " user-id)))))
 
+(defn get-tweets [user-id]
+  (try
+   (into [] (sql/query db/spec (str "select * from tweets where "
+                                    "user_id = " user-id)))
+   (catch Exception e
+     (println (str "Got exception" e)
+              []))))
+
 (defn get-user [user-id]
   (try
     (let [user (query-user user-id)]

@@ -21,3 +21,11 @@
           :else {:status 200}))
       (catch Exception e
         {:status 500 :body {:error "Something went wrong please try again"}}))))
+
+(defn get-user-tweets [user-id]
+  (let [[user] (user/query-user user-id)]
+    (do
+      (println user-id)
+     (if (nil? user)
+       {:status 404 :body {:error (str "User with id " user-id " not found")}}
+       {:body {:tweets (user/get-tweets user-id)}}))))
