@@ -16,9 +16,9 @@
   (let [{user-id "user" follower-id "follower"} follow-details]
     (try
       (let [status (user/follow user-id follower-id)]
-        (cond
-          (string? status) {:status 400 :body {:error status}}
-          :else {:status 200}))
+        (if (string? status)
+          {:status 400 :body {:error status}}
+          {:status 200}))
       (catch Exception e
         {:status 500 :body {:error "Something went wrong please try again"}}))))
 
