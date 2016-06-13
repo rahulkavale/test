@@ -28,6 +28,8 @@
         (let [user (parse-json payload)
               tweet-id (:tweet_id params)]
           (tweet-controller/retweet tweet-id user)))
+  (GET "/tweets/:tweet_id/retweeters" [tweet_id]
+       (tweet-controller/get-retweeters tweet_id))
   (GET "/users" [] (user-controller/get-all-users))
   (GET "/users/:user_id/tweets" [user_id]
        (do

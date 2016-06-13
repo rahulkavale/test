@@ -53,3 +53,12 @@
         (nil? user) "User does not exists"
         (nil? tweet) "Tweet does not exist"
         :else (insert-retweet tweet user))))) 
+
+
+(defn retweeters-for [tweet-id]
+  (try
+    (into [] (sql/query db/spec (str "select user_id, created_at from retweets"
+                                     " where tweet_id = " tweet-id)))
+    (catch Exception e
+      (println (str "could not get retweeters, got exception " e))
+      [])))

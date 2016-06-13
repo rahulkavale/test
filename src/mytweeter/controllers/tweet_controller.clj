@@ -23,3 +23,10 @@
 (defn delete-all []
   (tweet/delete-all))
 
+(defn get-retweeters [tweet-id]
+  (let [tweet (tweet/get-tweet tweet-id)]
+    (do
+      (println (str "looking up retweeters for " tweet-id))
+      (if (nil? tweet)
+        {:status 404 :body {:error "Tweet does not exist"}}
+        {:status 200 :body {:retweeters (tweet/retweeters-for tweet-id)}}))))
