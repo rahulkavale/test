@@ -43,6 +43,7 @@
     (catch Exception e
       (println (str " go exception " e))
       false)))
+
 (defn follows? [user-id follower-id]
   (not (empty? (into [] (sql/query db/spec
                                (str "select * from followers where user_id = " user-id

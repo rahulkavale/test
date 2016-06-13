@@ -6,11 +6,19 @@
   (into [] (sql/query db/spec "select * from tweets")))
 
 (defn valid? [tweet]
-  (not (empty? tweet )))
+  (and (not (empty? tweet ))
+       (not (nil? (get tweet "user_id")))
+       (not (nil? (get tweet "body")))))
+
+(defn insert-tweet [tweet]
+  (vec (sql/insert! db/spec
+                    :tweets
+                    [:body :user_id]
+                    [(get tweet "body") (get tweet "user_id")])))
 
 (defn create [tweet]
   (try
-    (let [[status]  (vec (sql/insert! db/spec :tweets [:body] [tweet]))]
+    (let [[status] (insert-tweet tweet)]
       (= status 1))
     (catch Exception e
       (println (str "got exception " e))

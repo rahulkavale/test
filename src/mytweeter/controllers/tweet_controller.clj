@@ -10,7 +10,7 @@
     (let [status (tweet/create tweet)]
       (cond
         (= status true) {:status 200}
-        :else {:status 400 :error "could not create tweet"}))))
+        :else {:status 400 :body {:error "Could not create tweet"}}))))
 
 (defn delete-all []
   (tweet/delete-all))

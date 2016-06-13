@@ -18,11 +18,12 @@
     (parse-string body)))
 
 (defroutes app-routes
-  (GET "/tweets" [] (tweet-controller/get-all-tweets))
   (POST "/tweets" {tweet :body}
-        (tweet-controller/create-tweet (slurp tweet)))
+        (let [json (get (parse-json tweet) "tweet")]
+          (tweet-controller/create-tweet json)))
+  (GET "/tweets" [] (tweet-controller/get-all-tweets))
   (DELETE "/tweets" []
-          (tweet-controller/delete-all) )
+          (tweet-controller/delete-all))
   (GET "/users" [] (user-controller/get-all-users))
   (POST "/users" {request :body}
         (user-controller/create-user (parse-json request)))
