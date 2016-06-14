@@ -4,8 +4,9 @@
             [mytweeter.db :as db]
             [clojure.core.async
              :as a
-             :refer [>! <! go chan go-loop]]
-            [mytweeter.db :as db]))
+             :refer [>! >!! <! go chan go-loop]]
+            [mytweeter.db :as db]
+            [mytweeter.models.trending :as trending]))
 
 (def hashtag-chan (chan 2))
 
@@ -18,8 +19,6 @@
     (if (string? str-or-tweet)
       (extract-hashtags-from-string str-or-tweet)
       (extract-hashtags-from-string (:body str-or-tweet)))))
-
-;TODO calculate trending hashtags
 
 (defn get-hashtag [body]
   (first (into [] (sql/query db/spec (str "select * from hashtags where body = '" body "'")))))
@@ -51,11 +50,11 @@
       (doall (map #(insert-tweet-hashtag tweet %) saved-hashtags)))))
 
 (defn process-hashtags []
-  (go
-    (loop []
-      (let [tweet (<! hashtag-chan)
-            hashtags (extract-hashtags tweet)]
-        (do
-          (println " hashtags " hashtags)
-          (associate-hashtags tweet hashtags)))
-     (recur ))))
+  (go-loop []
+    (let [tweet (<! hashtag-chan)
+          hashtags (extract-hashtags tweet)]
+      (associate-hashtags tweet hashtags)
+      ;;TODO map does not wor
+      ;; (doall (map (fn [h] (>! trending/trending-hashtags h)) hashtags))
+      (doseq [h hashtags] (>! trending/trending-hashtags-chan h)))
+    (recur)))

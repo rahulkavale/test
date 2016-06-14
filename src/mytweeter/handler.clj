@@ -11,7 +11,8 @@
             [mytweeter.controllers.user-controller :as user-controller]
             [mytweeter.models.tweet :as tweet]
             [cheshire.core :refer :all]
-            [mytweeter.models.hashtags :as hashtags])
+            [mytweeter.models.hashtags :as hashtags]
+            [mytweeter.models.trending :as trending])
   (:use ring.util.response))
 
 (defn parse-json [httpInputStream]
@@ -53,6 +54,7 @@
 
 (defn -main []
   (hashtags/process-hashtags)
+  (trending/process-trending-hashtags)
   (migration/migrate)
   (let [port (Integer. "8000")]
     (start port)))
