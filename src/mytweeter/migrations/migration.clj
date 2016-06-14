@@ -8,7 +8,8 @@
 
 ;TODO add foreign key constraints
 (defn migrate []
-  (if (reduce #(and %2 %1) (map table-exists? '("users" "followers" "tweets" "retweets")))
+  (if (reduce #(and %2 %1) (map table-exists?
+                                '("users" "followers" "tweets" "retweets" "hashtags" "tweet_hashtags")))
     (do
       (println "Running migrations")
       (sql/db-do-commands db/spec
@@ -40,6 +41,12 @@
                           (sql/create-table-ddl
                            :hashtags
                            [:id :serial "Primary Key"]
+                           [:body :varchar "NOT NULL"]))
+      (sql/db-do-commands db/spec
+                          (sql/create-table-ddl
+                           :tweet_hashtags
+                           [:id :serial "Primary Key"]
+                           [:hashtag_id :int "NOT NULL"]
                            [:tweet_id :int "NOT NULL"]
                            [:created_at :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"])))
     (println "Already migrated")))
