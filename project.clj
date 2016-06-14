@@ -9,7 +9,8 @@
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [ring/ring-jetty-adapter "1.4.0"]
                  [ring/ring-json "0.4.0"]
-                 [cheshire "5.6.1"]]
+                 [cheshire "5.6.1"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
   :main mytweeter.handler
   :plugins [[lein-ring "0.9.7"]]
   :ring {:handler mytweeter.handler/app}
