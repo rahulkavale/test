@@ -14,28 +14,32 @@
 
 (defn extract-hashtags [str-or-tweet]
   (do
-    (log/debug "extracting hashtags from " str-or-tweet)
+    (println "extracting hashtags from " str-or-tweet)
     (if (string? str-or-tweet)
       (extract-hashtags-from-string str-or-tweet)
       (extract-hashtags-from-string (:body str-or-tweet)))))
 
-;TODO save hashtags to a database
 ;TODO calculate trending hashtags
 
+(defn get-hashtag [body]
+  (first (into [] (sql/query db/spec (str "select * from hashtags where body = '" body "'")))))
 
-(defn exists? [hashtag]
-  (into [] (sql/query db/spec (str "select * from hashtags where body = '" hashtag "'"))))
+(defn get-or-create [hashtag]
+  (let [existing (get-hashtag hashtag)]
+    (if (empty? existing)
+      (sql/insert! db/spec
+                   :hashtags
+                   {:body hashtag})
+      existing)))
 
 
 ;TODO check if hashtag already present else insert
 (defn save-hashtags [hashtags]
-  (flatten (map #(sql/insert! db/spec
-                      :hashtags
-                      {:body %}) hashtags)))
+  (flatten (map get-or-create hashtags)))
 
 (defn insert-tweet-hashtag [tweet hashtag]
   (do
-    (log/debug "inserting " tweet " and " hashtag)
+    (println "inserting " tweet " and " hashtag)
     (sql/insert! db/spec
                  :tweet_hashtags
                  {:tweet_id (:id tweet) :hashtag_id (:id hashtag)})))
@@ -52,6 +56,6 @@
       (let [tweet (<! hashtag-chan)
             hashtags (extract-hashtags tweet)]
         (do
-          (log/debug "found hashtags " hashtags)
+          (println " hashtags " hashtags)
           (associate-hashtags tweet hashtags)))
      (recur ))))
