@@ -10,7 +10,8 @@
             [mytweeter.controllers.tweet-controller :as tweet-controller]
             [mytweeter.controllers.user-controller :as user-controller]
             [mytweeter.models.tweet :as tweet]
-            [cheshire.core :refer :all])
+            [cheshire.core :refer :all]
+            [mytweeter.models.hashtags :as hashtags])
   (:use ring.util.response))
 
 (defn parse-json [httpInputStream]
@@ -32,9 +33,7 @@
        (tweet-controller/get-retweeters tweet_id))
   (GET "/users" [] (user-controller/get-all-users))
   (GET "/users/:user_id/tweets" [user_id]
-       (do
-         (println (str "user id " user_id))
-         (user-controller/get-user-tweets user_id)))
+       (user-controller/get-user-tweets user_id))
   (POST "/users" {request :body}
         (user-controller/create-user (parse-json request)))
   (POST "/follow" {follow-info :body}
@@ -53,6 +52,7 @@
   (ring/run-jetty app {:port port}))
 
 (defn -main []
+  (hashtags/process-hashtags)
   (migration/migrate)
   (let [port (Integer. "8000")]
     (start port)))
