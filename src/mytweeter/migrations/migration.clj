@@ -35,5 +35,11 @@
                            [:id :serial "Primary Key"]
                            [:user_id :int "NOT NULL"]
                            [:tweet_id :int "NOT NULL"]
+                           [:created_at :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"]))
+      (sql/db-do-commands db/spec
+                          (sql/create-table-ddl
+                           :hashtags
+                           [:id :serial "Primary Key"]
+                           [:tweet_id :int "NOT NULL"]
                            [:created_at :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"])))
     (println "Already migrated")))
