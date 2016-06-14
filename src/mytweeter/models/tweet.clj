@@ -14,16 +14,17 @@
 (defn insert-tweet [tweet]
   (vec (sql/insert! db/spec
                     :tweets
-                    [:body :user_id]
-                    [(get tweet "body") (read-string (get tweet "user_id"))])))
+                    tweet)))
+(defn parse-tweet [tweet]
+  (update-in tweet ["user_id"] read-string))
 
 (defn create [tweet]
   (try
-    (let [[status] (insert-tweet tweet)]
-      (= status 1))
+    (let [[inserted-tweet] (insert-tweet (parse-tweet tweet))]
+      inserted-tweet)
     (catch Exception e
       (println (str "got exception " e))
-      false)))
+      [false])))
 
 ;TODO better way for this
 (defn delete-all []
@@ -52,8 +53,7 @@
       (cond
         (nil? user) "User does not exists"
         (nil? tweet) "Tweet does not exist"
-        :else (insert-retweet tweet user))))) 
-
+        :else (insert-retweet tweet user)))))
 
 (defn retweeters-for [tweet-id]
   (try
@@ -62,3 +62,4 @@
     (catch Exception e
       (println (str "could not get retweeters, got exception " e))
       [])))
+

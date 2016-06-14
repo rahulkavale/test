@@ -10,15 +10,14 @@
 
 (defn create-tweet [tweet]
   (if (tweet/valid? tweet)
-    (let [status (tweet/create tweet)]
-      (cond
-        (= status true)
+    (let [inserted-tweet (tweet/create tweet)]
+      (if (map? inserted-tweet)
         (do
           (go (do
                 (println "putting tweet on hashtag channel")
-                (>! hashtags/hashtag-chan tweet)))
+                (>! hashtags/hashtag-chan inserted-tweet)))
           {:status 200})
-        :else {:status 400 :body {:error "Could not create tweet"}}))))
+        {:status 400 :body {:error "Could not create tweet"}}))))
 
 (defn retweet [tweet-id user]
   (do
