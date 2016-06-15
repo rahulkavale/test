@@ -12,8 +12,10 @@
                  [cheshire "5.6.1"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
   :main mytweeter.handler
-  :plugins [[lein-ring "0.9.7"]]
+  :plugins [[lein-ring "0.9.7"]
+            [lein-midje "3.2"]]
   :ring {:handler mytweeter.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.0"]]}})
+                        [ring/ring-mock "0.3.0"]
+                        [midje "1.8.3"]]}})
