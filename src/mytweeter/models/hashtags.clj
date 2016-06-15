@@ -27,7 +27,7 @@
   (first (into [] (sql/query db/spec (str "select * from hashtags where body = '" body "'")))))
 
 (defn get-or-create [hashtag-body]
-  "If a hashtag already exists with the content given, the 
+  "If a hashtag already exists with the content given, the
    corresponding db record is returnined, otherwise
    new record is created and returned"
   (let [existing (get-hashtag hashtag-body)]

@@ -4,11 +4,13 @@
             [clojure.tools.logging :as log]))
 
 (defn table-exists? [tablename]
+  "Checks if given table name is present or not"
   (empty?
    (sql/query db/spec [(str "select * from information_schema.tables where table_name ='" tablename  "'" )])))
 
 ;TODO add foreign key constraints
 (defn migrate []
+  "Creates tables if not exists already"
   (if (reduce #(and %2 %1) (map table-exists?
                                 '("users" "followers" "tweets" "retweets" "hashtags" "tweet_hashtags")))
     (do
