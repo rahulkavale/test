@@ -1,11 +1,9 @@
 (ns mytweeter.models.hashtag-test
-  (:require [clojure.test :refer :all])
+  (:require [midje.sweet :refer :all])
   (:require [mytweeter.models.hashtags :as hashtags]))
 
-(deftest should-extract-hashtags
-  (testing "should extract hashtags from a string"
-   (is (= '("#clojure" "#spec")
-          (hashtags/extract-hashtags "It looks a bit like ADT #clojure #spec @wvdlaan "))))
-  (testing "should extract hashtags from tweet map"
-    (is (= '("#clojure")
-           (hashtags/extract-hashtags {:body "#clojure interview question: list five reasons that clojure.core is not, and should not be, idiomatic #clojure"})))))
+(fact "Extract hashtags from tweet and tweet body string"
+      (hashtags/extract-hashtags "Tweet for #clojure #helpshift #clojure") =>
+      ["#clojure" "#helpshift"]
+      (hashtags/extract-hashtags {:body "A #new #tweet-with-hashtag"}) =>
+      ["#new" "#tweet-with-hashtag"])
