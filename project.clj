@@ -10,7 +10,8 @@
                  [ring/ring-jetty-adapter "1.4.0"]
                  [ring/ring-json "0.4.0"]
                  [cheshire "5.6.1"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [org.clojure/tools.logging "0.3.1"]]
   :main mytweeter.handler
   :plugins [[lein-ring "0.9.7"]
             [lein-midje "3.2"]]
