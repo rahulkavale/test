@@ -1,5 +1,6 @@
 (ns mytweeter.controllers.user-controller
-  (:require [mytweeter.models.user :as user]))
+  (:require [mytweeter.models.user :as user])
+  (:require [clojure.tools.logging :as log]))
 
 (defn get-all-users []
   {:body {:users (user/all)}})
@@ -24,8 +25,6 @@
 
 (defn get-user-tweets [user-id]
   (let [[user] (user/query-user user-id)]
-    (do
-      (println user-id)
-     (if (nil? user)
-       {:status 404 :body {:error (str "User with id " user-id " not found")}}
-       {:body {:tweets (user/get-tweets user-id)}}))))
+    (if (nil? user)
+      {:status 404 :body {:error (str "User with id " user-id " not found")}}
+      {:body {:tweets (user/get-tweets user-id)}})))

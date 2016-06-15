@@ -1,6 +1,7 @@
 (ns mytweeter.migrations.migration
   (:require [mytweeter.db :as db])
-  (:require [clojure.java.jdbc :as sql]))
+  (:require [clojure.java.jdbc :as sql]
+            [clojure.tools.logging :as log]))
 
 (defn table-exists? [tablename]
   (empty?
@@ -11,7 +12,7 @@
   (if (reduce #(and %2 %1) (map table-exists?
                                 '("users" "followers" "tweets" "retweets" "hashtags" "tweet_hashtags")))
     (do
-      (println "Running migrations")
+      (log/info "Running migrations")
       (sql/db-do-commands db/spec
                           (sql/create-table-ddl
                            :tweets
@@ -49,4 +50,4 @@
                            [:hashtag_id :int "NOT NULL"]
                            [:tweet_id :int "NOT NULL"]
                            [:created_at :timestamp "NOT NULL" "DEFAULT CURRENT_TIMESTAMP"])))
-    (println "Already migrated")))
+    (log/info "Already migrated")))

@@ -1,7 +1,8 @@
 (ns mytweeter.models.tweet
   (:require [clojure.java.jdbc :as sql]
             [mytweeter.models.user :as user])
-  (:require [mytweeter.db :as db]))
+  (:require [mytweeter.db :as db])
+  (:require [clojure.tools.logging :as log]))
 
 (defn all []
   (into [] (sql/query db/spec "select * from tweets")))
@@ -23,7 +24,7 @@
     (let [[inserted-tweet] (insert-tweet (parse-tweet tweet))]
       inserted-tweet)
     (catch Exception e
-      (println (str "got exception " e))
+      (log/error (str "got exception " e "while creating a tweet"))
       [false])))
 
 ;TODO better way for this
@@ -32,7 +33,7 @@
 
 (defn get-tweet [tweet-id]
   (do
-    (println (str "looking up tweet with id" tweet-id))
+    (log/info (str "looking up tweet with id" tweet-id))
     (first (into [] (sql/query db/spec (str "select * from tweets where id = " tweet-id))))))
 
 (defn insert-retweet [tweet user]
@@ -43,7 +44,7 @@
                  [(:id user) (:id tweet)])
     true
     (catch Exception e
-      (println (str "got exception " e " while retweeting"))
+      (log/error (str "got exception " e " while retweeting"))
       "could not retweet, please try again")))
 
 (defn retweet [tweet-id user]
@@ -60,6 +61,6 @@
     (into [] (sql/query db/spec (str "select user_id, created_at from retweets"
                                      " where tweet_id = " tweet-id)))
     (catch Exception e
-      (println (str "could not get retweeters, got exception " e))
+      (log/error (str "could not get retweeters, got exception " e))
       [])))
 

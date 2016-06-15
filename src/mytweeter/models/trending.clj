@@ -1,7 +1,8 @@
 (ns mytweeter.models.trending
   (:require [clojure.core.async :as a
              :refer [>! <! chan go-loop]]
-            [mytweeter.utils :as utils]))
+            [mytweeter.utils :as utils]
+            [clojure.tools.logging :as log]))
 
 (def trending-hashtags-chan (chan 2))
 
@@ -10,8 +11,8 @@
 (defn process-trending-hashtags []
   (go-loop []
     (let [hashtag (<! trending-hashtags-chan)]
-      (println "found hahstag " hashtag " for trending calculation")
+      (log/info "found hahstag " hashtag " for trending calculation")
       (swap! trending-hashtags update-in [hashtag] (fnil inc 0) )
-      (println "map is now " @trending-hashtags))
+      (log/info "map is now " @trending-hashtags))
     (recur)))
 

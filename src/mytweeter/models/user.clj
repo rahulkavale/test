@@ -1,5 +1,6 @@
 (ns mytweeter.models.user
-  (:require [clojure.java.jdbc :as sql])
+  (:require [clojure.java.jdbc :as sql]
+            [clojure.tools.logging :as log])
   (:require [mytweeter.db :as db]))
 
 (defn all []
@@ -16,7 +17,7 @@
     (let [[status]  (vec (insert-user user))]
       (= status 1))
     (catch Exception e
-      (println (str "got exception " e))
+      (log/error (str "got exception " e))
       false)))
 
 (defn create-follower [user-id follower-id]
@@ -28,12 +29,12 @@
                    [user-id follower-id])
       true)
     (catch Exception e
-      (println (str "got exception " e " while create follower"))
+      (log/error (str "got exception " e " while create follower"))
       "could not create follower, please try again")))
 
 (defn query-user [user-id]
   (do
-    (println (str "looking for user with user-id " user-id ))
+    (log/info (str "looking for user with user-id " user-id ))
     (into [] (sql/query db/spec (str "select * from users where id = " user-id)))))
 
 (defn get-tweets [user-id]
@@ -41,7 +42,7 @@
    (into [] (sql/query db/spec (str "select * from tweets where "
                                     "user_id = " user-id)))
    (catch Exception e
-     (println (str "Got exception" e)
+     (log/error (str "Got exception" e)
               []))))
 
 (defn get-user [user-id]
@@ -49,7 +50,7 @@
     (let [user (query-user user-id)]
       (first user))
     (catch Exception e
-      (println (str " go exception " e))
+      (log/error (str " go exception " e))
       false)))
 
 (defn follows? [user-id follower-id]

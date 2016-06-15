@@ -3,7 +3,8 @@
             [mytweeter.models.hashtags :as hashtags])
   (:require [ring.middleware.json :as json]
             [clojure.core.async :as a
-             :refer [>! <! chan go]]))
+             :refer [>! <! chan go]]
+            [clojure.tools.logging :as log]))
 
 (defn get-all-tweets []
   {:body {:tweets (tweet/all)}})
@@ -14,14 +15,14 @@
       (if (map? inserted-tweet)
         (do
           (go (do
-                (println "putting tweet on hashtag channel")
+                (log/info "putting tweet on hashtag channel")
                 (>! hashtags/hashtag-chan inserted-tweet)))
           {:status 200})
         {:status 400 :body {:error "Could not create tweet"}}))))
 
 (defn retweet [tweet-id user]
   (do
-    (println (str "retweeting tweet " tweet-id " by user " user))
+    (log/info (str "retweeting tweet " tweet-id " by user " user))
     (let [status (tweet/retweet tweet-id user)]
       (if (string? status)
         {:status 404 :body {:error status}}
@@ -33,7 +34,7 @@
 (defn get-retweeters [tweet-id]
   (let [tweet (tweet/get-tweet tweet-id)]
     (do
-      (println (str "looking up retweeters for " tweet-id))
+      (log/info (str "looking up retweeters for " tweet-id))
       (if (nil? tweet)
         {:status 404 :body {:error "Tweet does not exist"}}
         {:status 200 :body {:retweeters (tweet/retweeters-for tweet-id)}}))))

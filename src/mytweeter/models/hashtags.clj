@@ -6,7 +6,8 @@
              :as a
              :refer [>! >!! <! go chan go-loop]]
             [mytweeter.db :as db]
-            [mytweeter.models.trending :as trending]))
+            [mytweeter.models.trending :as trending]
+            [clojure.tools.logging :as log]))
 
 (def hashtag-chan (chan 2))
 
@@ -15,7 +16,7 @@
 
 (defn extract-hashtags [str-or-tweet]
   (do
-    (println "extracting hashtags from " str-or-tweet)
+    (log/info "extracting hashtags from " str-or-tweet)
     (if (string? str-or-tweet)
       (extract-hashtags-from-string str-or-tweet)
       (extract-hashtags-from-string (:body str-or-tweet)))))
@@ -38,14 +39,14 @@
 
 (defn insert-tweet-hashtag [tweet hashtag]
   (do
-    (println "inserting " tweet " and " hashtag)
+    (log/info "inserting " tweet " and " hashtag)
     (sql/insert! db/spec
                  :tweet_hashtags
                  {:tweet_id (:id tweet) :hashtag_id (:id hashtag)})))
 
 (defn associate-hashtags [tweet hashtags]
   (do
-    (println "associating hashtags " hashtags " with " tweet)
+    (log/info "associating hashtags " hashtags " with " tweet)
     (let [saved-hashtags (save-hashtags hashtags)]
       (doall (map #(insert-tweet-hashtag tweet %) saved-hashtags)))))
 
