@@ -9,6 +9,8 @@
 (def trending-hashtags (atom {}))
 
 (defn process-trending-hashtags []
+  "listens to channle where hashtags are pushed
+   keeps a occurance count for each of the hashtag"
   (go-loop []
     (let [hashtag (<! trending-hashtags-chan)]
       (log/info "found hahstag " hashtag " for trending calculation")
