@@ -18,12 +18,11 @@
         (do
           (go (log/info "putting tweet on hashtag channel")
               (>! hashtags/hashtag-chan inserted-tweet))
-          {:status 200})
+          {:status 200 :body {:id (:id inserted-tweet)}})
         {:status 400 :body {:error "Could not create tweet"}}))))
 
 (defn retweet [tweet-id user]
-  "retweet the given tweet by the user specified, the user format is 
-   {\"user_id\": \"1235\"}
+  "retweet the given tweet by the user specified, the user format is {\"user_id\": \"1235\"}
   "
   (log/info (str "retweeting tweet " tweet-id " by user " user))
   (let [status (tweet/retweet tweet-id user)]

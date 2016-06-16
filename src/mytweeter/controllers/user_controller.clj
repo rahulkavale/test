@@ -9,11 +9,10 @@
 (defn create-user [user]
   "creates a user from given payload containing first_name"
   (if (user/valid? user)
-    (let [status (user/create user)]
+    (let [user-id (user/create user)]
       (cond
-        (= status true) {:status 200}
+        (not (nil? user-id)) {:status 200 :body {:id user-id}}
         :else {:status 400 :error "could not create user"}))))
-
 
 (defn follow [follow-details]
   "create follow relation between the user and follower given"
