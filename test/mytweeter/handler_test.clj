@@ -1,4 +1,4 @@
-(ns mytweeter.handlter-test
+(ns mytweeter.handler-test
   (:require  [midje.sweet :as midje :refer :all]
              [ring.mock.request :as mock]
              [cheshire.core :refer :all]

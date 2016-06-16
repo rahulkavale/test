@@ -43,6 +43,14 @@
   (POST "/follow" {follow-info :body}
         (user-controller/follow (parse-json follow-info))))
 
+(defn wrap-server-exception [handler]
+  (fn [request]
+    (try
+      (println "processing handler")
+      (handler request)
+      (catch Exception e
+        {:status 500 :body {:error "Oops, something went wrong!"}}))))
+
 (defn wrap-middleware [handler]
   (-> handler
       (wrap-defaults api-defaults)
@@ -50,6 +58,7 @@
 
 (def app
   (-> (handler/api app-routes)
+      (wrap-server-exception)
       (middleware/wrap-json-response)))
 
 (defn start [port]
