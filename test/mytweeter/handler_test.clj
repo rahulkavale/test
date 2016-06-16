@@ -23,3 +23,12 @@
         (count (get user-response "users")) => 1
         (get (first (get user-response "users")) "first_name") => "superman"))
 
+(fact "should create tweets"
+      (let [tweet-request-payload (generate-string {"tweet" {"body" "Tweet body" "user_id" "12345"}})
+            create-tweet-response (handler/app (mock/request :post "/tweets" tweet-request-payload))
+            all-tweets-reponse (handler/app (mock/request :get "/tweets"))
+            tweets (parse-string (:body all-tweets-reponse))]
+        (:status create-tweet-response) => 200
+        (:status all-tweets-reponse) => 200
+        (count (get tweets "tweets")) => 1
+        (get (first (get tweets "tweets")) "body") => "Tweet body"))
