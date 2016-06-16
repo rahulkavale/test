@@ -6,7 +6,7 @@
 
 (defn all []
   "Get all the tweets"
-  (into [] (sql/query db/spec "select * from tweets")))
+  (into [] (sql/query @db/config "select * from tweets")))
 
 (defn valid? [tweet]
   "Check if the tweet map is valid, checks for presence of user_id and body keys
@@ -17,7 +17,7 @@
 
 (defn insert-tweet [tweet]
   "Insert the tweet into the database, returns the tweet map containing the databse id"
-  (vec (sql/insert! db/spec
+  (vec (sql/insert! @db/config
                     :tweets
                     tweet)))
 (defn parse-tweet [tweet]
@@ -36,17 +36,17 @@
 ;TODO better way for this
 (defn delete-all []
   "Deletes all the tweets"
-  (sql/delete! db/spec :tweets ["true = ? " true]))
+  (sql/delete! @db/config :tweets ["true = ? " true]))
 
 (defn get-tweet [tweet-id]
   "Get a tweet from database given its id"
   (log/info (str "looking up tweet with id" tweet-id))
-  (first (into [] (sql/query db/spec (str "select * from tweets where id = " tweet-id)))))
+  (first (into [] (sql/query @db/config (str "select * from tweets where id = " tweet-id)))))
 
 (defn insert-retweet [tweet user]
   "Insert retweet record for the given user and tweet"
   (try
-    (sql/insert! db/spec
+    (sql/insert! @db/config
                  :retweets
                  [:user_id :tweet_id]
                  [(:id user) (:id tweet)])
@@ -68,7 +68,7 @@
 (defn retweeters-for [tweet-id]
   "get the retweets for the given tweet-id"
   (try
-    (into [] (sql/query db/spec (str "select user_id, created_at from retweets"
+    (into [] (sql/query @db/config (str "select user_id, created_at from retweets"
                                      " where tweet_id = " tweet-id)))
     (catch Exception e
       (log/error (str "could not get retweeters, got exception " e))

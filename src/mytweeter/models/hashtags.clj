@@ -24,7 +24,7 @@
 
 (defn get-hashtag [body]
   "Get a hashtag by its content, returns nil if nothing found"
-  (first (into [] (sql/query db/spec (str "select * from hashtags where body = '" body "'")))))
+  (first (into [] (sql/query @db/config (str "select * from hashtags where body = '" body "'")))))
 
 (defn get-or-create [hashtag-body]
   "If a hashtag already exists with the content given, the
@@ -32,7 +32,7 @@
    new record is created and returned"
   (let [existing (get-hashtag hashtag-body)]
     (if (empty? existing)
-      (sql/insert! db/spec
+      (sql/insert! @db/config
                    :hashtags
                    {:body hashtag-body})
       existing)))
@@ -47,7 +47,7 @@
   "Insert a tweet and its associated hashtag
    takes tweet map and hashtag map with id"
   (log/info "inserting " tweet " and " hashtag)
-  (sql/insert! db/spec
+  (sql/insert! @db/config
                :tweet_hashtags
                {:tweet_id (:id tweet) :hashtag_id (:id hashtag)}))
 

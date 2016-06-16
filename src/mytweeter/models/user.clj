@@ -5,30 +5,32 @@
 
 (defn all []
   "get all the users"
-  (into [] (sql/query db/spec "select * from users")))
+  (into [] (sql/query @db/config "select * from users")))
 
 (defn valid? [user]
   "check if the user is valid ie non empty"
-  (not (empty? user )))
+  (and (not (empty? user ))
+       (not (nil? (get-in user ["user" "first_name"])))))
 
 (defn insert-user [user]
   "executes sql to insert the user record into user database table"
-  (sql/insert! db/spec :users [:first_name] [(get-in user ["user" "first_name"])]))
+  (sql/insert! @db/config :users {:first_name (get-in user ["user" "first_name"])}))
 
 (defn create [user]
   "Create a user given map of user details
    returns boolean indicating success or failure of the opreation"
   (try
-    (let [[status]  (vec (insert-user user))]
-      (= status 1))
+    (log/info "Creating user with payload " user)
+    (let [user-map (insert-user user)]
+      (:id (first user-map)))
     (catch Exception e
       (log/error (str "got exception " e))
-      false)))
+      nil)))
 
 (defn create-follower [user-id follower-id]
   "Create database record for the given follower to the given user"
   (try
-    (sql/insert! db/spec
+    (sql/insert! @db/config
                  :followers
                  [:user_id :follower_id]
                  [user-id follower-id])
@@ -40,12 +42,12 @@
 (defn query-user [user-id]
   "function to query database to get the user given a user id"
   (log/info (str "looking for user with user-id " user-id ))
-  (into [] (sql/query db/spec (str "select * from users where id = " user-id))))
+  (into [] (sql/query @db/config (str "select * from users where id = " user-id))))
 
 (defn get-tweets [user-id]
   "Returns tweets for a given user-id, returns empty vecotr if none found"
   (try
-   (into [] (sql/query db/spec (str "select * from tweets where "
+   (into [] (sql/query @db/config (str "select * from tweets where "
                                     "user_id = " user-id)))
    (catch Exception e
      (log/error (str "Got exception" e)
@@ -62,7 +64,7 @@
 
 (defn follows? [user-id follower-id]
   "Check if a given followe-id follows the given user-id"
-  (not (empty? (into [] (sql/query db/spec
+  (not (empty? (into [] (sql/query @db/config
                                (str "select * from followers where user_id = " user-id
                                     " and follower_id = " follower-id))))))
 
