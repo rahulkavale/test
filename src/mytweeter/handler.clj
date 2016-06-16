@@ -1,19 +1,20 @@
 (ns mytweeter.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+            [compojure.handler :as handler]
+            [cheshire.core :refer :all])
+  (:require [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.params :as rmp]
             [ring.adapter.jetty :as ring]
-            [compojure.handler :as handler]
-            [ring.middleware.json :as middleware]
-            [mytweeter.migrations.migration :as migration]
-            [mytweeter.controllers.tweet-controller :as tweet-controller]
+            [ring.middleware.json :as middleware])
+  (:require [mytweeter.controllers.tweet-controller :as tweet-controller]
             [mytweeter.controllers.user-controller :as user-controller]
             [mytweeter.models.tweet :as tweet]
-            [cheshire.core :refer :all]
             [mytweeter.models.hashtags :as hashtags]
-            [mytweeter.models.trending :as trending])
-  (:use ring.util.response))
+            [mytweeter.models.trending :as trending]
+            [mytweeter.migrations.migration :as migration])
+  (:use ring.util.response)
+  (:require [clojure.tools.logging :as log]))
 
 (defn parse-json [httpInputStream]
   (let [body (slurp httpInputStream)]
@@ -36,7 +37,9 @@
   (GET "/users/:user_id/tweets" [user_id]
        (user-controller/get-user-tweets user_id))
   (POST "/users" {request :body}
-        (user-controller/create-user (parse-json request)))
+        (do
+          (log/debug "received request to create user")
+          (user-controller/create-user (parse-json request))))
   (POST "/follow" {follow-info :body}
         (user-controller/follow (parse-json follow-info))))
 
