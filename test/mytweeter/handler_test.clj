@@ -32,3 +32,24 @@
         (:status all-tweets-reponse) => 200
         (count (get tweets "tweets")) => 1
         (get (first (get tweets "tweets")) "body") => "Tweet body"))
+
+(let [user-request-payload (generate-string {"user" {"first_name" "superman"}})
+      create-user-response (handler/app (mock/request :post "/users" user-request-payload))
+      tweet-request-payload (generate-string {"tweet" {"body" "Tweet body" "user_id" "12345"}})
+      create-tweet-response (handler/app (mock/request :post "/tweets" tweet-request-payload))
+      tweet-id (get (helper/parse create-tweet-response) "id")
+      user-id (get (helper/parse create-user-response) "id")
+      retweet-payload (generate-string {"user_id" user-id})
+      retweet-endpoint (str "/tweets/" tweet-id "/retweet")
+      retweet-response (handler/app (mock/request :post retweet-endpoint retweet-payload))
+      get-retweeters-endpoint (str "/tweets/" tweet-id "/retweeters")
+      retweeters-response (handler/app (mock/request :get get-retweeters-endpoint))
+      retweeter-user-ids (map #(get % "user_id") (get (helper/parse retweeters-response) "retweeters"))]
+  (fact "A user should be able to retweet"
+        (:status create-user-response) => 200
+        (:status create-tweet-response) => 200
+        (:status retweet-response) => 200
+        (:status retweet-response) => 200
+        (:status retweeters-response) => 200
+        (count retweeter-user-ids) => 1
+        (first retweeter-user-ids) => user-id))
